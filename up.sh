@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+cd "$(dirname "$0")"
+
 if test "$(git branch --show-current)" != trigger-build; then
 	echo "Not on branch trigger-build, I don't like it." 1>&2
 	exit -1
