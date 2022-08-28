@@ -1,8 +1,12 @@
-FROM alpine:3.11 as builder
+FROM docker.io/library/alpine:3.16 as builder
 ENV UPX_VERSION=devel \
-    LDFLAGS=-static
+    LDFLAGS=-static \
+    CXXFLAGS_WERROR=
 RUN apk add --no-cache build-base ucl-dev zlib-dev zlib-static git
-RUN git clone --depth 1 --recursive -b devel https://github.com/upx/upx.git /upx
+ARG rev
+RUN git clone https://github.com/upx/upx.git /upx \
+    && cd /upx && git checkout ${rev} \
+    && git submodule update --init --recursive
 RUN cd /upx/src && \
     make -j$(nproc) upx.out CHECK_WHITESPACE= && \
     mkdir -p /opt/staging/bin /opt/staging/share/doc && \
@@ -12,4 +16,7 @@ RUN cd /upx/src && \
 
 FROM scratch
 ENTRYPOINT ["/bin/upx"]
+LABEL org.opencontainers.image.source=https://github.com/jcaesar/upx-static-docker
+ARG rev
+LABEL de.liftm.upx-static-docker.rev=${rev}
 COPY --from=builder /opt/staging/ /
