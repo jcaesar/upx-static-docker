@@ -13,7 +13,7 @@ jobs:
       label: ${{ steps.pulllabel.outputs.label }}
     steps:
       - id: lsremote
-        run: echo ::set-output name=rev::$(git ls-remote -q https://github.com/upx/upx refs/tags/v3.96 2>/dev/null | head -n1 | sed 's/\s.*$//' )
+        run: echo ::set-output name=rev::$(git ls-remote -q https://github.com/upx/upx 2>/dev/null | head -n1 | sed 's/\s.*$//' )
       - id: pulllabel
         run: docker pull docker.io/liftm/upx:latest && echo ::set-output name=label::$(docker image inspect --format '{{index .Config.Labels "de.liftm.upx-static-docker.rev"}}' docker.io/liftm/upx:latest)
   up:
