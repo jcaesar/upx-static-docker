@@ -2,17 +2,17 @@ FROM docker.io/library/alpine:3.16 as builder
 ENV UPX_VERSION=devel \
     LDFLAGS=-static \
     CXXFLAGS_WERROR=
-RUN apk add --no-cache build-base ucl-dev zlib-dev zlib-static git
+RUN apk add --no-cache build-base ucl-dev zlib-dev zlib-static git cmake
 ARG rev
-RUN git clone https://github.com/upx/upx.git /upx \
-    && cd /upx && git checkout ${rev} \
+RUN git clone https://github.com/upx/upx.git /opt/src \
+    && cd /opt/src && git checkout ${rev} \
     && git submodule update --init --recursive
-RUN cd /upx/src && \
-    make -j$(nproc) upx.out CHECK_WHITESPACE= && \
+RUN cmake -S /opt/src -B /opt/build && cmake --build /opt/build --parallel
+RUN \
     mkdir -p /opt/staging/bin /opt/staging/share/doc && \
-    /upx/src/upx.out --lzma -o /opt/staging/bin/upx /upx/src/upx.out && \
-    cp /upx/COPYING /opt/staging/share/doc/upx-COPYING.txt && \
-    cp /upx/LICENSE /opt/staging/share/doc/upx-LICENSE.txt
+    /opt/build/upx --lzma -o /opt/staging/bin/upx /opt/build/upx && \
+    cp /opt/src/COPYING /opt/staging/share/doc/upx-COPYING.txt && \
+    cp /opt/src/LICENSE /opt/staging/share/doc/upx-LICENSE.txt
 
 FROM scratch
 ENTRYPOINT ["/bin/upx"]
