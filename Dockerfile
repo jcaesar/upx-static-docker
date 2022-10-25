@@ -7,7 +7,7 @@ ARG rev
 RUN git clone https://github.com/upx/upx.git /opt/src \
     && cd /opt/src && git checkout ${rev} \
     && git submodule update --init --recursive
-RUN cmake -S /opt/src -B /opt/build && cmake --build /opt/build --parallel
+RUN cmake -S /opt/src -B /opt/build && cmake --build /opt/build
 RUN \
     mkdir -p /opt/staging/bin /opt/staging/share/doc && \
     /opt/build/upx --lzma -o /opt/staging/bin/upx /opt/build/upx && \
