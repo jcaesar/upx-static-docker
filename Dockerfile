@@ -2,7 +2,7 @@ FROM docker.io/library/alpine:3.16 as builder
 ENV UPX_VERSION=devel \
     LDFLAGS=-static \
     CXXFLAGS_WERROR=
-RUN apk add --no-cache build-base ucl-dev zlib-dev zlib-static git cmake
+RUN apk add --no-cache build-base git cmake
 ARG rev
 RUN git clone https://github.com/upx/upx.git /opt/src \
     && cd /opt/src && git checkout ${rev} \
